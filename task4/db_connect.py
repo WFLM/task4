@@ -96,13 +96,15 @@ class MySQLConnection(DBConnection):
     def truncate_tables(self):
         cursor = self._connection.cursor()
 
-        cursor.execute("SHOW DATABASES LIKE 'Students'")
-        if cursor.fetchone():
-            cursor.execute("TRUNCATE TABLES Students")
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 0")  # just for this cursor
 
-        cursor.execute("SHOW DATABASES LIKE 'Rooms'")
+        cursor.execute("SHOW TABLES LIKE 'Students'")
         if cursor.fetchone():
-            cursor.execute("TRUNCATE TABLES Rooms")
+            cursor.execute("TRUNCATE TABLE Students")
+
+        cursor.execute("SHOW TABLES LIKE 'Rooms'")
+        if cursor.fetchone():
+            cursor.execute("TRUNCATE TABLE Rooms")
 
         cursor.close()
 
