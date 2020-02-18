@@ -5,8 +5,8 @@ class DBGetData:
     def _rooms_number_of_students(self):
         cursor = self._db_connection.cursor()
         sql_query = """
-        SELECT r.room_id, r.room_name, COUNT(s.room_id) as num_of_students
-        FROM rooms_accounting.Students as s, rooms_accounting.Rooms as r
+        SELECT r.room_id, r.room_name, COUNT(s.room_id) AS num_of_students
+        FROM rooms_accounting.Students AS s, rooms_accounting.Rooms AS r
         WHERE r.room_id = s.room_id
         GROUP BY s.room_id
         """
@@ -25,7 +25,7 @@ class DBGetData:
                       (DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(s.birthday, '%m%d'))
                     )
                   ) AS avg_age
-        FROM Students as s, Rooms as r
+        FROM Students AS s, Rooms AS r
         WHERE s.room_id = r.room_id
         GROUP BY s.room_id
         ORDER BY avg_age
@@ -36,3 +36,29 @@ class DBGetData:
         cursor.close()
         return data
 
+    def _rooms_top5_max_age_difference(self):
+        cursor = self._db_connection.cursor()
+        sql_query = """
+        SELECT r.room_id, r.room_name,
+                MAX(
+                    (
+                        (YEAR(CURRENT_DATE) - YEAR(s.birthday)) - 
+                        (DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(s.birthday, '%m%d'))
+                    )
+                ) -
+                MIN(
+                    (
+                        (YEAR(CURRENT_DATE) - YEAR(s.birthday)) -
+                        (DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(s.birthday, '%m%d'))
+                    )
+                ) AS age_diff
+        FROM Students as s, Rooms as r
+        WHERE s.room_id = r.room_id
+        GROUP BY s.room_id
+        ORDER BY age_diff DESC, s.room_id ASC
+        LIMIT 5;
+        """
+        cursor.execute(sql_query)
+        data = cursor.fetchall()  # (id, room_name, age_difference)
+        cursor.close()
+        return data
