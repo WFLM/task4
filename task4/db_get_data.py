@@ -8,7 +8,7 @@ class DBGetData:
         SELECT r.room_id, r.room_name, COUNT(s.room_id) AS num_of_students
         FROM rooms_accounting.Students AS s, rooms_accounting.Rooms AS r
         WHERE r.room_id = s.room_id
-        GROUP BY s.room_id
+        GROUP BY s.room_id;
         """
         cursor.execute(sql_query)
         data = cursor.fetchall()  # (id, room_name, num_of_students)
@@ -52,7 +52,7 @@ class DBGetData:
                         (DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(s.birthday, '%m%d'))
                     )
                 ) AS age_diff
-        FROM Students as s, Rooms as r
+        FROM Students AS s, Rooms AS r
         WHERE s.room_id = r.room_id
         GROUP BY s.room_id
         ORDER BY age_diff DESC, s.room_id ASC
@@ -60,5 +60,22 @@ class DBGetData:
         """
         cursor.execute(sql_query)
         data = cursor.fetchall()  # (id, room_name, age_difference)
+        cursor.close()
+        return data
+
+    def _rooms_with_different_sexes_students(self):
+        cursor = self._db_connection.cursor()
+        sql_query = """
+        SELECT r.room_id, r.room_name
+               --, COUNT(CASE WHEN s.sex="M" THEN 1 ELSE NULL END) as M, 
+               --  COUNT(CASE WHEN s.sex="F" THEN 1 ELSE NULL END) as F
+        FROM Students AS s, Rooms AS r
+        WHERE s.room_id = r.room_id
+        GROUP BY s.room_id
+        HAVING (COUNT(CASE WHEN s.sex="M" THEN 1 ELSE NULL END) != 0) AND 
+               (COUNT(CASE WHEN s.sex="F" THEN 1 ELSE NULL END) != 0);
+        """
+        cursor.execute(sql_query)
+        data = cursor.fetchall()  # (id, room_name)
         cursor.close()
         return data
