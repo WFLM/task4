@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import json
 from lxml import etree  # this cython module "lxml" is used because "xml" cannot make pretty-printed files
+from decimal import Decimal
 
 
 class DataFileConstructor(metaclass=ABCMeta):
@@ -13,6 +14,15 @@ class DataFileConstructor(metaclass=ABCMeta):
         pass
 
 
+class DecimalEncode(json.JSONEncoder):
+    """Encoding Decimal to int"""
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return int(o)
+        else:
+            super().default(self, o)
+
+
 class JSONConstructor(DataFileConstructor):
     def __init__(self, data_sequence, data_format):
         self._data_sequence = data_sequence
@@ -23,12 +33,13 @@ class JSONConstructor(DataFileConstructor):
         if self._prepared_data is None:
             self._prepared_data = [dict(zip(self._data_format, data)) for data in self._data_sequence]
 
-    def construct_file(self, output_file_path="output.json"):
+    def construct_file(self, output_file_path="output"):
         self._prepare_data()
 
-        with open(file=output_file_path, mode="w") as json_output_fh:
+        with open(file=f"{output_file_path}.json", mode="w") as json_output_fh:
             json.dump(obj=self._prepared_data,
                       fp=json_output_fh,
+                      cls=DecimalEncode,
                       indent=4
                       )
 
@@ -52,9 +63,9 @@ class XMLConstructor(DataFileConstructor):
         tree = etree.ElementTree(root_xml)
         return tree
 
-    def construct_file(self, output_file_path="output.xml"):
+    def construct_file(self, output_file_path="output"):
         tree = self._make_xml_root()
-        tree.write(output_file_path, encoding="utf-8", pretty_print=True)
+        tree.write(f"{output_file_path}.xml", encoding="utf-8", pretty_print=True)
 
 
 format_handlers = {"json": JSONConstructor, "xml": XMLConstructor}

@@ -2,13 +2,6 @@ import mysql.connector
 from abc import ABCMeta, abstractmethod
 
 
-DB_PARAMS = {"host": "localhost",
-             "db_name": "rooms_accounting",
-             "user": "user",
-             "password": "12345sql"
-             }
-
-
 class DBConnection(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, host, db_name, user, password):
@@ -114,3 +107,6 @@ class MySQLConnection(DBConnection):
     @property
     def connection(self):
         return self._connection
+
+
+dbms = {"mysql": MySQLConnection}

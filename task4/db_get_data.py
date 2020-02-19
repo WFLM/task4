@@ -2,7 +2,7 @@ class DBGetData:
     def __init__(self, db_connection):
         self._db_connection = db_connection
 
-    def _rooms_number_of_students(self):
+    def rooms_number_of_students(self):
         data_format = ("id", "room_name", "number_of_students")
         cursor = self._db_connection.cursor()
         sql_query = """
@@ -16,7 +16,7 @@ class DBGetData:
         cursor.close()
         return data_format, data
 
-    def _rooms_top5_min_average_age(self):
+    def rooms_top5_min_average_age(self):
         data_format = ("id", "room_name", "average_age")
         cursor = self._db_connection.cursor()
         sql_query = """
@@ -38,7 +38,7 @@ class DBGetData:
         cursor.close()
         return data_format, data
 
-    def _rooms_top5_max_age_difference(self):
+    def rooms_top5_max_age_difference(self):
         data_format = ("id", "room_name", "age_difference")
         cursor = self._db_connection.cursor()
         sql_query = """
@@ -66,7 +66,7 @@ class DBGetData:
         cursor.close()
         return data_format, data
 
-    def _rooms_with_different_sexes_students(self):
+    def rooms_with_different_sexes_students(self):
         data_format = ("id", "room_name", "males", "females")
         cursor = self._db_connection.cursor()
         sql_query = """

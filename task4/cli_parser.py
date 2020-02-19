@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from typing import Tuple, NoReturn
 from argparse import ArgumentParser
 import sys

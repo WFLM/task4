@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-
-
-from typing import Tuple, List, Iterable, Optional
+from typing import Tuple, Optional
 import json
-from dataclasses import dataclass
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 
