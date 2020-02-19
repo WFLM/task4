@@ -3,7 +3,7 @@ class DBGetData:
         self._db_connection = db_connection
 
     def _rooms_number_of_students(self):
-        data_format = ("id", "room name", "number of students")
+        data_format = ("id", "room_name", "number_of_students")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name, COUNT(s.room_id) AS num_of_students
@@ -17,7 +17,7 @@ class DBGetData:
         return data_format, data
 
     def _rooms_top5_min_average_age(self):
-        data_format = ("id", "room name", "average age")
+        data_format = ("id", "room_name", "average_age")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
@@ -39,7 +39,7 @@ class DBGetData:
         return data_format, data
 
     def _rooms_top5_max_age_difference(self):
-        data_format = ("id", "room name", "age difference")
+        data_format = ("id", "room_name", "age_difference")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
@@ -67,7 +67,7 @@ class DBGetData:
         return data_format, data
 
     def _rooms_with_different_sexes_students(self):
-        data_format = ("id", "room name", "males", "females")
+        data_format = ("id", "room_name", "males", "females")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
