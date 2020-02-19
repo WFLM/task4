@@ -42,7 +42,6 @@ class MySQLConnection(DBConnection):
 
         self._create_db_if_not_exists(db_name)
         self.create_tables()
-        self.create_indexes()
 
     def __del__(self):
         self._connection.close()
@@ -79,7 +78,10 @@ class MySQLConnection(DBConnection):
         sex ENUM('M', 'F') NOT NULL,
         room_id INT,
         PRIMARY KEY (student_id),
-        FOREIGN KEY (room_id)  REFERENCES Rooms (room_id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (room_id)  REFERENCES Rooms (room_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        INDEX (room_id),
+        INDEX (birthday),
+        INDEX (sex)
         )
         """)
         cursor.close()
@@ -87,13 +89,6 @@ class MySQLConnection(DBConnection):
     def create_tables(self):
         self._create_rooms_table_if_not_exists()
         self._create_students_table_if_not_exists()
-
-    def create_indexes(self):
-        cursor = self._connection.cursor()
-        cursor.execute("CREATE INDEX room_id on Students(room_id)")
-        cursor.execute("CREATE INDEX birthday on Students(birthday)")
-        cursor.execute("CREATE INDEX sex on Students(sex)")
-        cursor.close()
 
     def drop_tables(self):
         cursor = self._connection.cursor()
