@@ -3,6 +3,7 @@ class DBGetData:
         self._db_connection = db_connection
 
     def _rooms_number_of_students(self):
+        data_format = ("id", "room name", "number of students")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name, COUNT(s.room_id) AS num_of_students
@@ -13,9 +14,10 @@ class DBGetData:
         cursor.execute(sql_query)
         data = cursor.fetchall()  # (id, room_name, num_of_students)
         cursor.close()
-        return data
+        return data_format, data
 
     def _rooms_top5_min_average_age(self):
+        data_format = ("id", "room name", "average age")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
@@ -34,9 +36,10 @@ class DBGetData:
         cursor.execute(sql_query)
         data = cursor.fetchall()  # (id, room_name, average_age)
         cursor.close()
-        return data
+        return data_format, data
 
     def _rooms_top5_max_age_difference(self):
+        data_format = ("id", "room name", "age difference")
         cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
@@ -61,14 +64,15 @@ class DBGetData:
         cursor.execute(sql_query)
         data = cursor.fetchall()  # (id, room_name, age_difference)
         cursor.close()
-        return data
+        return data_format, data
 
     def _rooms_with_different_sexes_students(self):
+        data_format = ("id", "room name", "males", "females")
         cursor = self._db_connection.cursor()
         sql_query = """
-        SELECT r.room_id, r.room_name
-               --, COUNT(CASE WHEN s.sex="M" THEN 1 ELSE NULL END) as M, 
-               --  COUNT(CASE WHEN s.sex="F" THEN 1 ELSE NULL END) as F
+        SELECT r.room_id, r.room_name,
+               COUNT(CASE WHEN s.sex="M" THEN 1 ELSE NULL END) as M, 
+               COUNT(CASE WHEN s.sex="F" THEN 1 ELSE NULL END) as F
         FROM Students AS s, Rooms AS r
         WHERE s.room_id = r.room_id
         GROUP BY s.room_id
@@ -76,6 +80,6 @@ class DBGetData:
                (COUNT(CASE WHEN s.sex="F" THEN 1 ELSE NULL END) != 0);
         """
         cursor.execute(sql_query)
-        data = cursor.fetchall()  # (id, room_name)
+        data = cursor.fetchall()  # (id, room_name, males, females)
         cursor.close()
-        return data
+        return data_format, data
