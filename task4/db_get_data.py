@@ -2,23 +2,26 @@ class DBGetData:
     def __init__(self, db_connection):
         self._db_connection = db_connection
 
+    def query_executor(self, sql_query):
+        cursor = self._db_connection.cursor()  # context managers aren't implemented in this module for cursors
+        cursor.execute(sql_query)
+        data = cursor.fetchall()
+        cursor.close()
+        return data
+
     def rooms_number_of_students(self):
         data_format = ("id", "room_name", "number_of_students")
-        cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name, COUNT(s.room_id) AS num_of_students
         FROM rooms_accounting.Students AS s, rooms_accounting.Rooms AS r
         WHERE r.room_id = s.room_id
         GROUP BY s.room_id;
         """
-        cursor.execute(sql_query)
-        data = cursor.fetchall()  # (id, room_name, num_of_students)
-        cursor.close()
+        data = self.query_executor(sql_query)
         return data_format, data
 
     def rooms_top5_min_average_age(self):
         data_format = ("id", "room_name", "average_age")
-        cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
                AVG(
@@ -33,14 +36,11 @@ class DBGetData:
         ORDER BY avg_age
         LIMIT 5;
         """
-        cursor.execute(sql_query)
-        data = cursor.fetchall()  # (id, room_name, average_age)
-        cursor.close()
+        data = self.query_executor(sql_query)
         return data_format, data
 
     def rooms_top5_max_age_difference(self):
         data_format = ("id", "room_name", "age_difference")
-        cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
                 MAX(
@@ -61,14 +61,11 @@ class DBGetData:
         ORDER BY age_diff DESC, s.room_id ASC
         LIMIT 5;
         """
-        cursor.execute(sql_query)
-        data = cursor.fetchall()  # (id, room_name, age_difference)
-        cursor.close()
+        data = self.query_executor(sql_query)
         return data_format, data
 
     def rooms_with_different_sexes_students(self):
         data_format = ("id", "room_name", "males", "females")
-        cursor = self._db_connection.cursor()
         sql_query = """
         SELECT r.room_id, r.room_name,
                COUNT(CASE WHEN s.sex="M" THEN 1 ELSE NULL END) as M, 
@@ -79,7 +76,5 @@ class DBGetData:
         HAVING (COUNT(CASE WHEN s.sex="M" THEN 1 ELSE NULL END) != 0) AND 
                (COUNT(CASE WHEN s.sex="F" THEN 1 ELSE NULL END) != 0);
         """
-        cursor.execute(sql_query)
-        data = cursor.fetchall()  # (id, room_name, males, females)
-        cursor.close()
+        data = self.query_executor(sql_query)
         return data_format, data
